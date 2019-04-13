@@ -41,7 +41,7 @@ namespace UnitTestDatabaseGenerator
             @out.AppendLine("using HelperLibrary;");
             @out.AppendLine("using System.Collections.Generic;");
             @out.AppendLine("");
-            @out.AppendLine("namespace NHibernateDataLayer." + _databaseName + ".TableGenerator");
+            @out.AppendLine("namespace DataLayer." + _databaseName + ".TableGenerator");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic partial class " + _databaseName + "Tables");

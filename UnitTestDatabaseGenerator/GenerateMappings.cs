@@ -82,7 +82,6 @@ namespace UnitTestDatabaseGenerator
 
         private void CreateTableGeneratorMappings()
         {
-            //TODO: these mappings will be used by unit tests to generate the tables in the database so NHibernate is not needed
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode"));
 
             var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName);

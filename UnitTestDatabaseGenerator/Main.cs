@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Data.Sql;
-using System.IO;
 using System.Windows.Forms;
 using UnitTestHelperLibrary;
 
@@ -72,7 +69,7 @@ namespace UnitTestDatabaseGenerator
 		{
             foreach (int index in lstDatabases.CheckedIndices)
 			{
-				var nhibernateMappings = new GenerateMappings
+				var mappings = new GenerateMappings
 					{
 						DatabaseName = lstDatabases.Items[index].ToString(),
 						ConnectionString = GetConnectionString(),
@@ -81,7 +78,7 @@ namespace UnitTestDatabaseGenerator
 						GenerateViewMappings = cbViewMappings.Checked,
                         RootDirectory = txtDestinationDirectory.Text
                 };
-				nhibernateMappings.CreateMappings();
+                mappings.CreateMappings();
 			}
 
 			// indicate that the operation has completed

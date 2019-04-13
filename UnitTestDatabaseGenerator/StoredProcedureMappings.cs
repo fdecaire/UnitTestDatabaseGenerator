@@ -28,52 +28,6 @@ namespace UnitTestDatabaseGenerator
             _storedProcedureName = _storedProcedureName.Replace(".", "_dot_");
         }
 
-        // this method will create an object that can be used by LINQ to access the stored procedure
-        private string CreateStoredProcedureNHibernateMapping()
-        {
-            var @out = new StringBuilder();
-
-            //TODO: parse the stored procedure code and find all the variable names and types
-            //TODO: generate the C# code that will be the method used inside LINQ code
-            /*
-CREATE PROCEDURE [dbo].[ReadPersonByLastName]
-	@LastName char(50)
-AS
-			 
-			  
-			 db.CreateSQLQuery("exec pSetClassForTeacher @LastName=:LastName")
-					.SetParameter("LastName", 3)
-					.SetTimeout(100)
-					.ExecuteUpdate();
-			 
-			 
-			 public class class_with_properties
-			 {
-					prop1 {get;set;}
-					prop2 {get;set;}
-			 }
-			 
-			 public static class partial StoreProcedureClasses
-			 {
-					public static class_with_properties spname()
-					{
-							var resultSet =
-								db.CreateSQLQuery("exec database..spname @LastName=:LastName")
-									.SetResultTransformer(Transformers.AliasToBean<class_with_properties>())
-									.SetParameter("LastName", 3)
-									.List<class_with_properties>();
-			  
-							return resultSet;
-					}
-			 }
-			*/
-
-            //TODO: need to find out if there is a return result set and create a class with properties, then use the transformer
-            //TODO: need to figure out how to determine what the result set will be
-
-            return @out.ToString();
-        }
-
         private string LookupStoredProcedureCode()
         {
             string result = "";
@@ -106,7 +60,7 @@ GO
 
             @out.AppendLine("using HelperLibrary;");
             @out.AppendLine("");
-            @out.AppendLine("namespace NHibernateDataLayer." + _databaseName + ".StoredProcedures");
+            @out.AppendLine("namespace DataLayer." + _databaseName + ".StoredProcedures");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic partial class " + _storedProcedureName + " : StoredProc");

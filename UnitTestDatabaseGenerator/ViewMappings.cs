@@ -50,7 +50,7 @@ GO
 
             @out.AppendLine("using HelperLibrary;");
             @out.AppendLine("");
-            @out.AppendLine("namespace NHibernateDataLayer." + _databaseName + ".Views");
+            @out.AppendLine("namespace DataLayer." + _databaseName + ".Views");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic partial class view" + _viewName + " : ViewCreator");
