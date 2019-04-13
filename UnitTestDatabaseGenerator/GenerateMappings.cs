@@ -39,14 +39,13 @@ namespace UnitTestDatabaseGenerator
                 CreateConstraintMappings();
             }
 
-            //ModifyVsProjectFile();
             DeleteUnusedFiles();
         }
 
         private void Setup()
         {
             // scan for all the files that currently exist and insert them into DeleteFiles
-            DirSearch(RootDirectory + DatabaseName);
+            DirSearch(Path.Combine(RootDirectory, DatabaseName));
             _folderList.Add(DatabaseName + "\\Constraints");
             _folderList.Add(DatabaseName + "\\StoredProcedures");
             _folderList.Add(DatabaseName + "\\Tables");
@@ -84,12 +83,12 @@ namespace UnitTestDatabaseGenerator
         private void CreateTableGeneratorMappings()
         {
             //TODO: these mappings will be used by unit tests to generate the tables in the database so NHibernate is not needed
-            Directory.CreateDirectory(RootDirectory + DatabaseName + "\\TableGeneratorCode");
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode"));
 
             var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName);
             var result = tableGeneratorMappings.EmitCode();
 
-            using (var file = new StreamWriter(RootDirectory + DatabaseName + "\\TableGeneratorCode\\" + DatabaseName + "TableGeneratorCode.cs"))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode", DatabaseName + "TableGeneratorCode.cs")))
             {
                 file.Write(result);
             }
@@ -97,26 +96,26 @@ namespace UnitTestDatabaseGenerator
             UpdateProjectFileList("TableGeneratorCode", DatabaseName + "TableGeneratorCode");
         }
 
-        private void UpdateProjectFileList(string tableSPView, string Name)
+        private void UpdateProjectFileList(string tableSpView, string name)
         {
             // delete any existing table mappings first (in case a table was deleted)
             //TODO: refactor this
-            var foundIndex = _deletedFiles.IndexOf(RootDirectory + DatabaseName + "\\" + tableSPView + "\\" + Name + ".cs");
+            var foundIndex = _deletedFiles.IndexOf(Path.Combine(RootDirectory, DatabaseName, tableSpView, name + ".cs"));
             if (foundIndex > -1)
             {
                 _deletedFiles.RemoveAt(foundIndex);
             }
 
-            if (Name != "")
+            if (name != "")
             {
                 // added file
-                _addedFiles.Add(DatabaseName + "\\" + tableSPView + "\\" + Name + ".cs");
+                _addedFiles.Add(DatabaseName + "\\" + tableSpView + "\\" + name + ".cs");
             }
         }
 
         public void CreateStoredProcedureMappings()
         {
-            Directory.CreateDirectory(RootDirectory + DatabaseName + "\\StoredProcedures");
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures"));
 
             var noStoredProceduresCreated = true;
             var query = "SELECT ROUTINE_NAME FROM " + DatabaseName + ".information_schema.routines WHERE routine_type = 'PROCEDURE'";
@@ -138,7 +137,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateStoredProcedure(string storedProcedureName)
         {
-            using (var file = new StreamWriter(RootDirectory + DatabaseName + "\\StoredProcedures\\" + storedProcedureName + ".cs"))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures", storedProcedureName + ".cs")))
             {
                 var storedProcedureMappings = new StoredProcedureMappings(ConnectionString, DatabaseName, storedProcedureName);
 
@@ -150,7 +149,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateViewMappings()
         {
-            Directory.CreateDirectory(RootDirectory + DatabaseName + "\\Views");
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Views"));
 
             var noViewsCreated = true;
             var query = "SELECT TABLE_NAME FROM " + DatabaseName + ".information_schema.views";
@@ -173,7 +172,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateView(string viewName)
         {
-            using (var file = new StreamWriter(RootDirectory + DatabaseName + "\\Views\\" + viewName + ".cs"))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Views", viewName + ".cs")))
             {
                 var viewMappings = new ViewMappings(ConnectionString, DatabaseName, viewName);
 
@@ -185,53 +184,17 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateConstraintMappings()
         {
-            Directory.CreateDirectory(RootDirectory + DatabaseName + "\\Constraints");
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Constraints"));
 
             var constraintMappings = new ConstraintMappings(ConnectionString, DatabaseName);
             var result = constraintMappings.EmitCode();
 
-            using (var file = new StreamWriter(RootDirectory + DatabaseName + "\\Constraints\\" + DatabaseName + "Constraints.cs"))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Constraints", DatabaseName + "Constraints.cs")))
             {
                 file.Write(result);
             }
 
             UpdateProjectFileList("Constraints", DatabaseName + "Constraints");
-        }
-
-        private void ModifyVsProjectFile()
-        {
-            // create xml code inside .csproj file
-            var projectFileName = "";
-
-            // search for a project file in the rootdirectory and then modify the proj file.
-            // otherwise, just create the files there but ignore this section
-            foreach (string f in Directory.GetFiles(RootDirectory))
-            {
-                if (f.EndsWith(".csproj"))
-                {
-                    projectFileName = f;
-                    break;
-                }
-            }
-
-            if (projectFileName == "")
-            {
-                return;
-            }
-
-            var doc = new XmlDocument();
-            doc.Load(projectFileName);
-
-            var nsmgr = new XmlNamespaceManager(doc.NameTable);
-            nsmgr.AddNamespace("a", "http://schemas.microsoft.com/developer/msbuild/2003");
-            var itemGroupNodes = doc.SelectNodes("//a:Project/a:ItemGroup", nsmgr);
-
-            DeleteNodeContainingChildName(itemGroupNodes, "Folder");
-            DeleteNodeContainingChildName(itemGroupNodes, "Compile");
-            DeleteEmptyNodes(itemGroupNodes);
-            AddNewNodes(doc, nsmgr, itemGroupNodes);
-
-            doc.Save(projectFileName);
         }
 
         private void AddNewNodes(XmlDocument doc, XmlNamespaceManager nsmgr, XmlNodeList itemGroupNodes)

@@ -19,9 +19,8 @@ namespace UnitTestDatabaseGenerator
 
 
 			//TODO: set the selected item to the last saved item
-
-
-		}
+            txtDestinationDirectory.Text = @"c:\temp\testoutput";
+        }
 
 		private string GetConnectionString()
 		{
@@ -78,8 +77,9 @@ namespace UnitTestDatabaseGenerator
 						ConnectionString = GetConnectionString(),
 						GenerateIntegrityConstraintMappings = cbStoreProcMappings.Checked,
 						GenerateStoredProcedureMappings = cbStoreProcMappings.Checked,
-						GenerateViewMappings = cbViewMappings.Checked
-					};
+						GenerateViewMappings = cbViewMappings.Checked,
+                        RootDirectory = txtDestinationDirectory.Text
+                };
 				nhibernateMappings.CreateMappings();
 			}
 
@@ -106,5 +106,10 @@ namespace UnitTestDatabaseGenerator
 				txtPassword.Enabled = false;
 			}
 		}
-	}
+
+        private void btnDirectorySelector_Click(object sender, EventArgs e)
+        {
+            //TODO: use find directory dialog box
+        }
+    }
 }

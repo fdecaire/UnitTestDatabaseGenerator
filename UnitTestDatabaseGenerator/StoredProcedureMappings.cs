@@ -5,9 +5,9 @@ namespace UnitTestDatabaseGenerator
 {
     public class StoredProcedureMappings
     {
-        private string _databaseName;
+        private readonly string _databaseName;
         private string _storedProcedureName;
-        private string _connectionString;
+        private readonly string _connectionString;
         private string _code;
 
         public StoredProcedureMappings(string connectionString, string databaseName, string storedProcedureName)

@@ -43,8 +43,9 @@
             this.cbViewMappings = new System.Windows.Forms.CheckBox();
             this.cbRelationalIntegrityMappings = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtDestinationDirectory = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnDirectorySelector = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -219,12 +220,12 @@
             this.label3.TabIndex = 16;
             this.label3.Text = "MS SQL Database Instance";
             // 
-            // textBox1
+            // txtDestinationDirectory
             // 
-            this.textBox1.Location = new System.Drawing.Point(14, 537);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(433, 20);
-            this.textBox1.TabIndex = 17;
+            this.txtDestinationDirectory.Location = new System.Drawing.Point(14, 537);
+            this.txtDestinationDirectory.Name = "txtDestinationDirectory";
+            this.txtDestinationDirectory.Size = new System.Drawing.Size(393, 20);
+            this.txtDestinationDirectory.TabIndex = 17;
             // 
             // label4
             // 
@@ -235,13 +236,24 @@
             this.label4.TabIndex = 18;
             this.label4.Text = "Output Project Destination Folder";
             // 
+            // btnDirectorySelector
+            // 
+            this.btnDirectorySelector.Location = new System.Drawing.Point(413, 537);
+            this.btnDirectorySelector.Name = "btnDirectorySelector";
+            this.btnDirectorySelector.Size = new System.Drawing.Size(32, 23);
+            this.btnDirectorySelector.TabIndex = 19;
+            this.btnDirectorySelector.Text = "...";
+            this.btnDirectorySelector.UseVisualStyleBackColor = true;
+            this.btnDirectorySelector.Click += new System.EventHandler(this.btnDirectorySelector_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 604);
+            this.Controls.Add(this.btnDirectorySelector);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtDestinationDirectory);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.cbRelationalIntegrityMappings);
             this.Controls.Add(this.cbViewMappings);
@@ -279,8 +291,9 @@
 		private System.Windows.Forms.CheckBox cbViewMappings;
 		private System.Windows.Forms.CheckBox cbRelationalIntegrityMappings;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtDestinationDirectory;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnDirectorySelector;
     }
 }
 
