@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Sql;
+using System.IO;
 using System.Windows.Forms;
 using UnitTestHelperLibrary;
 
@@ -109,7 +110,15 @@ namespace UnitTestDatabaseGenerator
 
         private void btnDirectorySelector_Click(object sender, EventArgs e)
         {
-            //TODO: use find directory dialog box
+            using (var folderBrowserDialog = new FolderBrowserDialog())
+            {
+                var result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    txtDestinationDirectory.Text = folderBrowserDialog.SelectedPath;
+                }
+            }
         }
     }
 }
