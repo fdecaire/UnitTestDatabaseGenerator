@@ -87,7 +87,7 @@ namespace UnitTestDatabaseGenerator
                         customType = ".CustomType(\"StringClob\")";
                     }
                     customType += ".CustomSqlType(\"" + DataType + " (" + StringLength + ")\")";
-                    lengthExtension = string.Format(".Length({0})", stringLengthForDotNet);
+                    lengthExtension = $".Length({stringLengthForDotNet})";
                     break;
                 case "text":
                     customType = ".CustomType(\"StringClob\").CustomSqlType(\"text\")";
@@ -100,7 +100,7 @@ namespace UnitTestDatabaseGenerator
                 case "char":
                 case "nchar":
                     customType = ".CustomSqlType(\"" + DataType + " (" + StringLength + ")\")";
-                    lengthExtension = string.Format(".Length({0})", stringLengthForDotNet);
+                    lengthExtension = $".Length({stringLengthForDotNet})";
                     break;
                 case "money":
                     customType = ".CustomSqlType(\"money\")";

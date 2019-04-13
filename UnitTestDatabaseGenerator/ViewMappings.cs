@@ -5,9 +5,9 @@ namespace UnitTestDatabaseGenerator
 {
     public class ViewMappings
     {
-        private string _databaseName;
-        private string _viewName;
-        private string _connectionString;
+        private readonly string _databaseName;
+        private readonly string _viewName;
+        private readonly string _connectionString;
         private string _code;
 
         public ViewMappings(string connectionString, string databaseName, string viewName)

@@ -30,7 +30,7 @@ namespace UnitTestDatabaseGenerator
 
         private string LookupStoredProcedureCode()
         {
-            string result = "";
+            var result = "";
 
             using (var db = new ADODatabaseContext(_connectionString.Replace("master", _databaseName)))
             {
@@ -89,5 +89,4 @@ GO
             return @out.ToString();
         }
     }
-
 }

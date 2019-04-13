@@ -6,8 +6,8 @@ namespace UnitTestDatabaseGenerator
 {
     public class TableGeneratorMappings
     {
-        private string _databaseName;
-        private string _connectionString;
+        private readonly string _databaseName;
+        private readonly string _connectionString;
 
         public TableGeneratorMappings(string connectionString, string databaseName)
         {
@@ -178,7 +178,6 @@ namespace UnitTestDatabaseGenerator
             return @out.ToString();
         }
 
-
         private string GetIdentitySeedAndIncrementValues(string tableName, string fieldName)
         {
             using (var db = new ADODatabaseContext(_connectionString))
@@ -200,5 +199,4 @@ namespace UnitTestDatabaseGenerator
             return "";
         }
     }
-
 }

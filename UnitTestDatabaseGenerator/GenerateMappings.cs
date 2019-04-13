@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 using UnitTestHelperLibrary;
 
 namespace UnitTestDatabaseGenerator
@@ -9,14 +8,12 @@ namespace UnitTestDatabaseGenerator
     {
         public string DatabaseName { get; set; }
         public string ConnectionString { get; set; }
-        public string RootDirectory = @"c:\temp"; //TODO: need to implement a user interface to be able to change this
+        public string RootDirectory { get; set; }
         public bool GenerateViewMappings { get; set; }
         public bool GenerateIntegrityConstraintMappings { get; set; }
         public bool GenerateStoredProcedureMappings { get; set; }
 
         private readonly List<string> _deletedFiles = new List<string>();
-        private readonly List<string> _addedFiles = new List<string>();
-        private readonly List<string> _folderList = new List<string>();
 
         public void CreateMappings()
         {
@@ -46,10 +43,6 @@ namespace UnitTestDatabaseGenerator
         {
             // scan for all the files that currently exist and insert them into DeleteFiles
             DirSearch(Path.Combine(RootDirectory, DatabaseName));
-            _folderList.Add(DatabaseName + "\\Constraints");
-            _folderList.Add(DatabaseName + "\\StoredProcedures");
-            _folderList.Add(DatabaseName + "\\Tables");
-            _folderList.Add(DatabaseName + "\\Views");
         }
 
         private void DeleteUnusedFiles()
@@ -64,19 +57,18 @@ namespace UnitTestDatabaseGenerator
 
         private void DirSearch(string sDir)
         {
-            if (Directory.Exists(sDir))
+            if (!Directory.Exists(sDir)) return;
+
+            foreach (var d in Directory.GetDirectories(sDir))
             {
-                foreach (string d in Directory.GetDirectories(sDir))
+                foreach (var f in Directory.GetFiles(d))
                 {
-                    foreach (string f in Directory.GetFiles(d))
+                    if (f.EndsWith(".cs"))
                     {
-                        if (f.EndsWith(".cs"))
-                        {
-                            _deletedFiles.Add(f);
-                        }
+                        _deletedFiles.Add(f);
                     }
-                    DirSearch(d);
                 }
+                DirSearch(d);
             }
         }
 
@@ -98,17 +90,10 @@ namespace UnitTestDatabaseGenerator
         private void UpdateProjectFileList(string tableSpView, string name)
         {
             // delete any existing table mappings first (in case a table was deleted)
-            //TODO: refactor this
             var foundIndex = _deletedFiles.IndexOf(Path.Combine(RootDirectory, DatabaseName, tableSpView, name + ".cs"));
             if (foundIndex > -1)
             {
                 _deletedFiles.RemoveAt(foundIndex);
-            }
-
-            if (name != "")
-            {
-                // added file
-                _addedFiles.Add(DatabaseName + "\\" + tableSpView + "\\" + name + ".cs");
             }
         }
 
@@ -125,6 +110,7 @@ namespace UnitTestDatabaseGenerator
                 {
                     // generate any new stored procedure mappings
                     CreateStoredProcedure(reader["ROUTINE_NAME"].ToString());
+                    noStoredProceduresCreated = false;
                 }
             }
 
@@ -194,129 +180,6 @@ namespace UnitTestDatabaseGenerator
             }
 
             UpdateProjectFileList("Constraints", DatabaseName + "Constraints");
-        }
-
-        private void AddNewNodes(XmlDocument doc, XmlNamespaceManager nsmgr, XmlNodeList itemGroupNodes)
-        {
-            var containsFolderItemGroup = false;
-            var containsCompileItemGroup = false;
-
-            foreach (XmlNode itemGroupNode in itemGroupNodes)
-            {
-                var childNodes = itemGroupNode.ChildNodes;
-
-                foreach (XmlNode childNode in childNodes)
-                {
-                    if (childNode.Name == "Folder")
-                    {
-                        containsFolderItemGroup = true;
-
-                        var includeAttribute = childNode.Attributes["Include"];
-
-                        if (includeAttribute != null)
-                        {
-                            foreach (var item in _folderList)
-                            {
-                                itemGroupNode.AppendChild(CreateChildNode(doc, "Folder", item));
-                            }
-                            break;
-                        }
-                    }
-                    else if (childNode.Name == "Compile")
-                    {
-                        containsCompileItemGroup = true;
-
-                        var includeAttribute = childNode.Attributes["Include"];
-
-                        foreach (var item in _addedFiles)
-                        {
-                            itemGroupNode.AppendChild(CreateChildNode(doc, "Compile", item));
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            // need to handle situation where the Compile or folder itemgroups do not exist
-            if (!containsFolderItemGroup)
-            {
-                var projectNode = doc.SelectNodes("//a:Project", nsmgr);
-                var itemGroupNode = doc.CreateNode(XmlNodeType.Element, "ItemGroup", "http://schemas.microsoft.com/developer/msbuild/2003");
-                projectNode[0].AppendChild(itemGroupNode);
-
-                foreach (var item in _folderList)
-                {
-                    itemGroupNode.AppendChild(CreateChildNode(doc, "Folder", item));
-                }
-            }
-
-            if (!containsCompileItemGroup)
-            {
-                var projectNode = doc.SelectNodes("//a:Project", nsmgr);
-                var itemGroupNode = doc.CreateNode(XmlNodeType.Element, "ItemGroup", "http://schemas.microsoft.com/developer/msbuild/2003");
-                projectNode[0].AppendChild(itemGroupNode);
-
-                foreach (var item in _addedFiles)
-                {
-                    itemGroupNode.AppendChild(CreateChildNode(doc, "Compile", item));
-                }
-            }
-        }
-
-        private void DeleteEmptyNodes(XmlNodeList itemGroupNodes)
-        {
-            // remove any empty ItemGroup nodes
-            foreach (XmlNode itemGroupNode in itemGroupNodes)
-            {
-                if (itemGroupNode.ChildNodes.Count == 0)
-                {
-                    itemGroupNode.ParentNode.RemoveChild(itemGroupNode);
-                }
-            }
-        }
-
-        private void DeleteNodeContainingChildName(XmlNodeList itemGroupNodes, string childGroupName)
-        {
-            var toBeRemoved = new List<XmlNode>();
-
-            foreach (XmlNode itemGroupNode in itemGroupNodes)
-            {
-                var childNodes = itemGroupNode.ChildNodes;
-
-                foreach (XmlNode childNode in childNodes)
-                {
-                    if (childNode.Name == childGroupName)
-                    {
-                        var includeAttribute = childNode.Attributes["Include"];
-
-                        if (includeAttribute != null && includeAttribute.Value != null && includeAttribute.Value.Contains(DatabaseName + "\\"))
-                        {
-                            toBeRemoved.Add(childNode);
-                        }
-                    }
-                }
-
-                foreach (var item in toBeRemoved)
-                {
-                    itemGroupNode.RemoveChild(item);
-                }
-
-                toBeRemoved.Clear();
-            }
-        }
-
-        private XmlNode CreateChildNode(XmlDocument doc, string elementName, string attributeValue)
-        {
-            var folderNode = doc.CreateNode(XmlNodeType.Element, elementName, "http://schemas.microsoft.com/developer/msbuild/2003");
-            var xKey = doc.CreateAttribute("Include");
-            xKey.Value = attributeValue;
-            folderNode.Attributes.Append(xKey);
-
-            return folderNode;
         }
     }
 }
