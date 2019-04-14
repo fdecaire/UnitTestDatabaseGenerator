@@ -23,7 +23,7 @@ namespace UnitTestDatabaseGenerator
             var firstTime = true;
 
             result.AppendLine("using System.Collections.Generic;");
-            result.AppendLine("using HelperLibrary;");
+            result.AppendLine("using UnitTestHelperLibrary;");
             result.AppendLine("");
             result.AppendLine("namespace ApplicationUnderTest." + _databaseName + ".Constraints");
             result.AppendLine("{");

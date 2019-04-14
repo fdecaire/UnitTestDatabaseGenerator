@@ -38,7 +38,7 @@ namespace UnitTestDatabaseGenerator
             var @out = new StringBuilder();
 
             @out.AppendLine("using System;");
-            @out.AppendLine("using HelperLibrary;");
+            @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("using System.Collections.Generic;");
             @out.AppendLine("");
             @out.AppendLine("namespace DataLayer." + _databaseName + ".TableGenerator");

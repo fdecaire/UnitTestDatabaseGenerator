@@ -58,7 +58,7 @@ SET QUOTED_IDENTIFIER ON
 GO 
 " + _code;
 
-            @out.AppendLine("using HelperLibrary;");
+            @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("");
             @out.AppendLine("namespace DataLayer." + _databaseName + ".StoredProcedures");
             @out.AppendLine("{");
