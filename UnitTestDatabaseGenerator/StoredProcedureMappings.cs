@@ -6,14 +6,16 @@ namespace UnitTestDatabaseGenerator
     public class StoredProcedureMappings
     {
         private readonly string _databaseName;
+        private readonly string _schemaName;
         private string _storedProcedureName;
         private readonly string _connectionString;
         private string _code;
 
-        public StoredProcedureMappings(string connectionString, string databaseName, string storedProcedureName)
+        public StoredProcedureMappings(string connectionString, string databaseName, string storedProcedureName, string schemaName)
         {
             _databaseName = databaseName;
             _storedProcedureName = storedProcedureName;
+            _schemaName = schemaName;
             _connectionString = connectionString;
 
             NormalizeStoredProcedureName();
@@ -34,10 +36,25 @@ namespace UnitTestDatabaseGenerator
 
             using (var db = new ADODatabaseContext(_connectionString.Replace("master", _databaseName)))
             {
-                var reader = db.ReadQuery("SELECT OBJECT_DEFINITION(OBJECT_ID('" + _storedProcedureName + "')) AS code");
+                var reader = db.ReadQuery($@"
+                    SELECT
+                        pr.name,
+                        m.definition,
+                        pr.type_desc,
+                        pr.create_date,
+                        pr.modify_date,
+                        schema_name(pr.schema_id)
+                    FROM
+                        sys.procedures pr
+                        INNER JOIN sys.sql_modules m ON pr.object_id = m.object_id
+                    WHERE
+                        is_ms_shipped = 0 AND
+                        schema_name(pr.schema_id) = '{_schemaName}' AND
+                        pr.name = '{_storedProcedureName}'
+                        ");
                 while (reader.Read())
                 {
-                    result = reader["code"].ToString();
+                    result = reader["definition"].ToString();
                 }
             }
 

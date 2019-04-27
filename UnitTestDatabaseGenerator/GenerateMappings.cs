@@ -102,14 +102,14 @@ namespace UnitTestDatabaseGenerator
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures"));
 
             var noStoredProceduresCreated = true;
-            var query = "SELECT ROUTINE_NAME FROM " + DatabaseName + ".information_schema.routines WHERE routine_type = 'PROCEDURE'";
+            var query = "SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM " + DatabaseName + ".information_schema.routines WHERE routine_type = 'PROCEDURE'";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
                     // generate any new stored procedure mappings
-                    CreateStoredProcedure(reader["ROUTINE_NAME"].ToString());
+                    CreateStoredProcedure(reader["ROUTINE_NAME"].ToString(),reader["ROUTINE_SCHEMA"].ToString());
                     noStoredProceduresCreated = false;
                 }
             }
@@ -120,11 +120,11 @@ namespace UnitTestDatabaseGenerator
             }
         }
 
-        public void CreateStoredProcedure(string storedProcedureName)
+        public void CreateStoredProcedure(string storedProcedureName, string schemaName)
         {
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures", storedProcedureName + ".cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures", storedProcedureName + $"_{schemaName}.cs")))
             {
-                var storedProcedureMappings = new StoredProcedureMappings(ConnectionString, DatabaseName, storedProcedureName);
+                var storedProcedureMappings = new StoredProcedureMappings(ConnectionString, DatabaseName, storedProcedureName, schemaName);
 
                 file.Write(storedProcedureMappings.EmitCode());
             }
