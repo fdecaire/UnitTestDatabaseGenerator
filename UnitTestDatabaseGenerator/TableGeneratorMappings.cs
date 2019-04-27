@@ -56,14 +56,14 @@ namespace UnitTestDatabaseGenerator
 
             @out.AppendLine("\t\tpublic static List<TableDefinition> TableList = new List<TableDefinition> {");
 
-            string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.tables";
+            string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
                     @out.Append("\t\t\tnew TableDefinition {");
-                    @out.Append(EmitTableGenerateCode(reader["TABLE_NAME"].ToString()));
+                    @out.Append(EmitTableGenerateCode(reader["TABLE_NAME"].ToString(),reader["TABLE_SCHEMA"].ToString()));
                     @out.AppendLine("},");
                 }
             }
@@ -75,14 +75,14 @@ namespace UnitTestDatabaseGenerator
             return @out.ToString();
         }
 
-        private string EmitTableGenerateCode(string tableName)
+        private string EmitTableGenerateCode(string tableName, string schema)
         {
             var @out = new StringBuilder();
             var firstTime = true;
 
             @out.Append("Name=\"" + tableName + "\", ");
 
-            @out.Append("CreateScript=\"CREATE TABLE [dbo].[" + tableName + "](");
+            @out.Append($"CreateScript=\"CREATE TABLE [{schema}].[{tableName}](");
             string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name='" + tableName + "' ORDER BY ORDINAL_POSITION";
             using (var db = new ADODatabaseContext(_connectionString))
             {
