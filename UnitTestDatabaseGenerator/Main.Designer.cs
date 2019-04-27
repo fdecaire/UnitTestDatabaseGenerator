@@ -46,6 +46,7 @@
             this.txtDestinationDirectory = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnDirectorySelector = new System.Windows.Forms.Button();
+            this.cbFunctionMappings = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,7 +71,7 @@
             this.lstDatabases.FormattingEnabled = true;
             this.lstDatabases.Location = new System.Drawing.Point(12, 237);
             this.lstDatabases.Name = "lstDatabases";
-            this.lstDatabases.Size = new System.Drawing.Size(433, 199);
+            this.lstDatabases.Size = new System.Drawing.Size(433, 169);
             this.lstDatabases.TabIndex = 1;
             this.lstDatabases.SelectedValueChanged += new System.EventHandler(this.lstDatabases_SelectedValueChanged);
             // 
@@ -178,7 +179,7 @@
             this.cbStoreProcMappings.AutoSize = true;
             this.cbStoreProcMappings.Checked = true;
             this.cbStoreProcMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbStoreProcMappings.Location = new System.Drawing.Point(12, 444);
+            this.cbStoreProcMappings.Location = new System.Drawing.Point(12, 417);
             this.cbStoreProcMappings.Name = "cbStoreProcMappings";
             this.cbStoreProcMappings.Size = new System.Drawing.Size(199, 17);
             this.cbStoreProcMappings.TabIndex = 13;
@@ -191,7 +192,7 @@
             this.cbViewMappings.AutoSize = true;
             this.cbViewMappings.Checked = true;
             this.cbViewMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbViewMappings.Location = new System.Drawing.Point(12, 467);
+            this.cbViewMappings.Location = new System.Drawing.Point(12, 440);
             this.cbViewMappings.Name = "cbViewMappings";
             this.cbViewMappings.Size = new System.Drawing.Size(145, 17);
             this.cbViewMappings.TabIndex = 14;
@@ -204,7 +205,7 @@
             this.cbRelationalIntegrityMappings.AutoSize = true;
             this.cbRelationalIntegrityMappings.Checked = true;
             this.cbRelationalIntegrityMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbRelationalIntegrityMappings.Location = new System.Drawing.Point(12, 490);
+            this.cbRelationalIntegrityMappings.Location = new System.Drawing.Point(12, 463);
             this.cbRelationalIntegrityMappings.Name = "cbRelationalIntegrityMappings";
             this.cbRelationalIntegrityMappings.Size = new System.Drawing.Size(209, 17);
             this.cbRelationalIntegrityMappings.TabIndex = 15;
@@ -246,11 +247,25 @@
             this.btnDirectorySelector.UseVisualStyleBackColor = true;
             this.btnDirectorySelector.Click += new System.EventHandler(this.btnDirectorySelector_Click);
             // 
+            // cbFunctionMappings
+            // 
+            this.cbFunctionMappings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cbFunctionMappings.AutoSize = true;
+            this.cbFunctionMappings.Checked = true;
+            this.cbFunctionMappings.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbFunctionMappings.Location = new System.Drawing.Point(12, 486);
+            this.cbFunctionMappings.Name = "cbFunctionMappings";
+            this.cbFunctionMappings.Size = new System.Drawing.Size(163, 17);
+            this.cbFunctionMappings.TabIndex = 20;
+            this.cbFunctionMappings.Text = "Generate Function Mappings";
+            this.cbFunctionMappings.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 604);
+            this.Controls.Add(this.cbFunctionMappings);
             this.Controls.Add(this.btnDirectorySelector);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtDestinationDirectory);
@@ -294,6 +309,7 @@
         private System.Windows.Forms.TextBox txtDestinationDirectory;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnDirectorySelector;
+        private System.Windows.Forms.CheckBox cbFunctionMappings;
     }
 }
 

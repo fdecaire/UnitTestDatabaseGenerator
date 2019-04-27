@@ -76,6 +76,7 @@ namespace UnitTestDatabaseGenerator
 						GenerateIntegrityConstraintMappings = cbStoreProcMappings.Checked,
 						GenerateStoredProcedureMappings = cbStoreProcMappings.Checked,
 						GenerateViewMappings = cbViewMappings.Checked,
+                        GenerateFunctionMappings = cbFunctionMappings.Checked,
                         RootDirectory = txtDestinationDirectory.Text
                 };
                 mappings.CreateMappings();

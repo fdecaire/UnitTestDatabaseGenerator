@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="ConstraintMappings.cs" />
     <Compile Include="FieldMapping.cs" />
+    <Compile Include="FunctionMappings.cs" />
     <Compile Include="GenerateMappings.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

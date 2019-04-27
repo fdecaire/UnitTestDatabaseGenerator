@@ -12,6 +12,7 @@ namespace UnitTestDatabaseGenerator
         public bool GenerateViewMappings { get; set; }
         public bool GenerateIntegrityConstraintMappings { get; set; }
         public bool GenerateStoredProcedureMappings { get; set; }
+        public bool GenerateFunctionMappings { get; set; }
 
         private readonly List<string> _deletedFiles = new List<string>();
 
@@ -36,7 +37,38 @@ namespace UnitTestDatabaseGenerator
                 CreateConstraintMappings();
             }
 
+            if (GenerateFunctionMappings)
+            {
+                CreateFunctionMappings();
+            }
+
             DeleteUnusedFiles();
+        }
+
+        private void CreateFunctionMappings()
+        {
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Functions"));
+            var query = $"SELECT ROUTINE_NAME,routine_schema FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'FUNCTION'";
+             
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    // generate any new stored procedure mappings
+                    CreateFunction(reader["ROUTINE_NAME"].ToString(), reader["ROUTINE_SCHEMA"].ToString());
+                }
+            }
+        }
+
+        public void CreateFunction(string functionName, string schemaName)
+        {
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Functions", functionName + $"_{schemaName}.cs")))
+            {
+                var functionMappings = new FunctionMappings(ConnectionString, DatabaseName, functionName, schemaName);
+
+                file.Write(functionMappings.EmitCode());
+            }
         }
 
         private void Setup()
@@ -102,7 +134,7 @@ namespace UnitTestDatabaseGenerator
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures"));
 
             var noStoredProceduresCreated = true;
-            var query = "SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM " + DatabaseName + ".information_schema.routines WHERE routine_type = 'PROCEDURE'";
+            var query = $"SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'PROCEDURE'";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
