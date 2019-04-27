@@ -83,7 +83,7 @@ namespace UnitTestDatabaseGenerator
             @out.Append("Name=\"" + tableName + "\", ");
 
             @out.Append($"CreateScript=\"CREATE TABLE [{schema}].[{tableName}](");
-            string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.COLUMNS WHERE table_name='" + tableName + "' ORDER BY ORDINAL_POSITION";
+            var query = $"SELECT * FROM {_databaseName}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='{tableName}' ORDER BY ORDINAL_POSITION";
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -98,8 +98,8 @@ namespace UnitTestDatabaseGenerator
                         @out.Append(",");
                     }
 
-                    @out.Append("[" + reader["COLUMN_NAME"].ToString() + "]");
-                    @out.Append("[" + reader["DATA_TYPE"].ToString() + "]");
+                    @out.Append($"[{reader["COLUMN_NAME"]}]");
+                    @out.Append($"[{reader["DATA_TYPE"]}]");
 
                     switch (reader["DATA_TYPE"].ToString().ToLower())
                     {
@@ -114,16 +114,16 @@ namespace UnitTestDatabaseGenerator
                             }
                             else
                             {
-                                @out.Append("(" + reader["CHARACTER_MAXIMUM_LENGTH"].ToString() + ")");
+                                @out.Append($"({reader["CHARACTER_MAXIMUM_LENGTH"]})");
                             }
                             break;
                         case "numeric":
                         case "money":
-                            @out.Append("(" + reader["NUMERIC_PRECISION"].ToString());
+                            @out.Append($"({reader["NUMERIC_PRECISION"]}");
 
                             if (reader["NUMERIC_SCALE"].ToString() != "")
                             {
-                                @out.Append("," + reader["NUMERIC_SCALE"].ToString());
+                                @out.Append($",{reader["NUMERIC_SCALE"]}");
                             }
 
                             @out.Append(")");
@@ -142,7 +142,7 @@ namespace UnitTestDatabaseGenerator
 
             // get the primary key
             firstTime = true;
-            query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='" + tableName + "' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
+            query = $"SELECT * FROM {_databaseName}.INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='{tableName}' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -150,7 +150,7 @@ namespace UnitTestDatabaseGenerator
                 {
                     if (firstTime)
                     {
-                        @out.Append(", CONSTRAINT [" + reader["CONSTRAINT_NAME"].ToString() + "] PRIMARY KEY CLUSTERED (");
+                        @out.Append($", CONSTRAINT [{reader["CONSTRAINT_NAME"]}] PRIMARY KEY CLUSTERED (");
                         firstTime = false;
                     }
                     else
@@ -158,7 +158,7 @@ namespace UnitTestDatabaseGenerator
                         @out.Append(",");
                     }
 
-                    @out.Append("[" + reader["COLUMN_NAME"].ToString() + "]");
+                    @out.Append($"[{reader["COLUMN_NAME"]}]");
 
                     @out.Append(" ASC");
 
@@ -191,7 +191,7 @@ namespace UnitTestDatabaseGenerator
                 {
                     while (columnReader.Read())
                     {
-                        return " IDENTITY(" + columnReader["SEED_VALUE"].ToString() + "," + columnReader["INCREMENT_VALUE"].ToString() + ")";
+                        return $" IDENTITY({columnReader["SEED_VALUE"]},{columnReader["INCREMENT_VALUE"]})";
                     }
                 }
             }
