@@ -16,12 +16,17 @@ namespace UnitTestDatabaseGenerator
         public bool GenerateFunctionMappings { get; set; }
 
         private readonly List<string> _deletedFiles = new List<string>();
-        private CancellationToken token;
+        private CancellationToken _token;
         public void CreateMappings(object action)
         {
-            token = (CancellationToken)action;
+            _token = (CancellationToken)action;
 
             Setup();
+
+            if (_token.IsCancellationRequested)
+            {
+                return;
+            }
 
             CreateTableGeneratorMappings();
 
@@ -30,14 +35,29 @@ namespace UnitTestDatabaseGenerator
                 CreateStoredProcedureMappings();
             }
 
+            if (_token.IsCancellationRequested)
+            {
+                return;
+            }
+
             if (GenerateViewMappings)
             {
                 CreateViewMappings();
             }
 
+            if (_token.IsCancellationRequested)
+            {
+                return;
+            }
+
             if (GenerateIntegrityConstraintMappings)
             {
                 CreateConstraintMappings();
+            }
+
+            if (_token.IsCancellationRequested)
+            {
+                return;
             }
 
             if (GenerateFunctionMappings)
@@ -58,6 +78,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     // generate any new stored procedure mappings
                     CreateFunction(reader["ROUTINE_NAME"].ToString(), reader["ROUTINE_SCHEMA"].ToString());
                 }
@@ -111,7 +136,7 @@ namespace UnitTestDatabaseGenerator
         {
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode"));
 
-            var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName);
+            var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName, _token);
             var result = tableGeneratorMappings.EmitCode();
 
             using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode", DatabaseName + "TableGeneratorCode.cs")))
@@ -143,6 +168,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     // generate any new stored procedure mappings
                     CreateStoredProcedure(reader["ROUTINE_NAME"].ToString(),reader["ROUTINE_SCHEMA"].ToString());
                     noStoredProceduresCreated = false;
@@ -178,6 +208,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     // generate any new view mappings
                     CreateView(reader["TABLE_NAME"].ToString());
                     noViewsCreated = false;

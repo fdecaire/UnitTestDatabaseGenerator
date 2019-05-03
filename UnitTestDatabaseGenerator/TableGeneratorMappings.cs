@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using UnitTestHelperLibrary;
 
 namespace UnitTestDatabaseGenerator
@@ -8,11 +9,13 @@ namespace UnitTestDatabaseGenerator
     {
         private readonly string _databaseName;
         private readonly string _connectionString;
+        private CancellationToken _token;
 
-        public TableGeneratorMappings(string connectionString, string databaseName)
+        public TableGeneratorMappings(string connectionString, string databaseName, object action)
         {
             _databaseName = databaseName;
             _connectionString = connectionString;
+            _token = (CancellationToken)action;
         }
 
         private List<string> ReadPrimaryKeyList(string tableName)
@@ -62,6 +65,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return "";
+                    }
+
                     @out.Append("\t\t\tnew TableDefinition {");
                     @out.Append(EmitTableGenerateCode(reader["TABLE_NAME"].ToString(),reader["TABLE_SCHEMA"].ToString()));
                     @out.AppendLine("},");
@@ -89,6 +97,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return "";
+                    }
+
                     if (firstTime)
                     {
                         firstTime = false;
@@ -148,6 +161,11 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return "";
+                    }
+
                     if (firstTime)
                     {
                         @out.Append($", CONSTRAINT [{reader["CONSTRAINT_NAME"]}] PRIMARY KEY CLUSTERED (");

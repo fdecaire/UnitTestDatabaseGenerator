@@ -21,21 +21,18 @@ namespace UnitTestDatabaseGenerator
             txtDestinationDirectory.Text = @"c:\temp\testoutput";
         }
 
-		private string GetConnectionString()
+		private string GetConnectionString
 		{
-			string result = "";
+            get
+            {
+                if (cbUseSQLAuthentication.Checked)
+                {
+                   return $"server={txtServerName.Text};Trusted_Connection=yes;database=master;User ID={txtUserId.Text};Password={txtPassword.Text}";
+                }
 
-			if (cbUseSQLAuthentication.Checked)
-			{
-				result = $"server={txtServerName.Text};Trusted_Connection=yes;database=master;User ID={txtUserId.Text};Password={txtPassword.Text}";
-			}
-			else
-			{
-				result = $"server={txtServerName.Text};Trusted_Connection=yes;database=master;Integrated Security=true;";
-			}
-
-			return result;
-		}
+                return $"server={txtServerName.Text};Trusted_Connection=yes;database=master;Integrated Security=true;";
+            }
+        }
 
 		// fill the check list box of databases from the server selected
 		private void PopulateDatabaseList()
@@ -45,7 +42,7 @@ namespace UnitTestDatabaseGenerator
 
 			var query = "SELECT name, database_id, create_date FROM sys.databases WHERE name NOT IN ('master','tempdb','model','msdb') ORDER BY name";
 
-			using (var db = new ADODatabaseContext(GetConnectionString()))
+			using (var db = new ADODatabaseContext(GetConnectionString))
 			{
 				var reader = db.ReadQuery(query);
 				while (reader.Read())
@@ -68,17 +65,26 @@ namespace UnitTestDatabaseGenerator
         
 		private void btnGenerate_Click(object sender, EventArgs e)
 		{
+            if (btnGenerate.Text == "Stop")
+            {
+                MasterProcessor.Instance.Stop();
+                lblResult.Text = "Process Cancelled";
+                return;
+            }
+
             var databaseList = new List<string>();
             foreach (int index in lstDatabases.CheckedIndices)
             {
                 databaseList.Add(lstDatabases.Items[index].ToString());
             }
 
-            MasterProcessor.Instance.Start(databaseList,GetConnectionString(), cbRelationalIntegrityMappings.Checked,
-                cbStoreProcMappings.Checked,cbViewMappings.Checked,
-                cbFunctionMappings.Checked,txtDestinationDirectory.Text);
+            MasterProcessor.Instance.Start(databaseList, GetConnectionString, cbRelationalIntegrityMappings.Checked,
+                cbStoreProcMappings.Checked, cbViewMappings.Checked,
+                cbFunctionMappings.Checked, txtDestinationDirectory.Text);
 
             btnGenerate.Text = "Stop";
+            lblResult.Text = "Process Complete";
+            lblResult.Visible = false;
             doneTimer.Enabled = true;
         }
 

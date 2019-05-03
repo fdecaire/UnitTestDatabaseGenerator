@@ -1,18 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace UnitTestDatabaseGenerator
 {
     public class MasterProcessor
     {
         private static MasterProcessor _instance;
-        public CancellationTokenSource cts = new CancellationTokenSource();
+        public CancellationTokenSource cts;
         public static MasterProcessor Instance => _instance ?? (_instance = new MasterProcessor());
         public static int PercentComplete { get; set; }
         public bool Stopped { get; private set; }
         public void Start(List<string> databaseList, string connectionString, bool constraints, bool storedProcedures, bool views, bool functions, string destinationDirectory)
         {
+            Stopped = false;
+            cts = new CancellationTokenSource();
+
             ThreadPool.QueueUserWorkItem(new WaitCallback(action =>
             {
                 var token = (CancellationToken)action;
