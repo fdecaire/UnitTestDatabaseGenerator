@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace UnitTestDatabaseGenerator
 {
@@ -21,8 +22,13 @@ namespace UnitTestDatabaseGenerator
 
                 if (!token.IsCancellationRequested)
                 {
-                    //TODO: change this to a parallel.foreach()
-                    foreach (var database in databaseList)
+                    var po = new ParallelOptions
+                    {
+                        CancellationToken = cts.Token,
+                        MaxDegreeOfParallelism = System.Environment.ProcessorCount
+                    };
+
+                    Parallel.ForEach(databaseList, po, (database) =>
                     {
                         var mappings = new GenerateMappings
                         {
@@ -34,9 +40,10 @@ namespace UnitTestDatabaseGenerator
                             GenerateFunctionMappings = functions,
                             RootDirectory = destinationDirectory
                         };
-                        mappings.CreateMappings(action); //TODO: pass cancellation token
-                    }
+                        mappings.CreateMappings(action);
+                    });
                 }
+
                 Stopped = true;
             }), cts.Token);
         }
