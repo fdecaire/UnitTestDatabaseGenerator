@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this.components = new System.ComponentModel.Container();
             this.btnGenerate = new System.Windows.Forms.Button();
             this.lstDatabases = new System.Windows.Forms.CheckedListBox();
             this.txtServerName = new System.Windows.Forms.TextBox();
@@ -47,6 +48,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.btnDirectorySelector = new System.Windows.Forms.Button();
             this.cbFunctionMappings = new System.Windows.Forms.CheckBox();
+            this.doneTimer = new System.Windows.Forms.Timer(this.components);
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -54,7 +57,7 @@
             // 
             this.btnGenerate.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnGenerate.Enabled = false;
-            this.btnGenerate.Location = new System.Drawing.Point(181, 569);
+            this.btnGenerate.Location = new System.Drawing.Point(181, 591);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(104, 23);
             this.btnGenerate.TabIndex = 0;
@@ -166,7 +169,7 @@
             this.lblResult.AutoSize = true;
             this.lblResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblResult.ForeColor = System.Drawing.Color.Green;
-            this.lblResult.Location = new System.Drawing.Point(290, 570);
+            this.lblResult.Location = new System.Drawing.Point(290, 592);
             this.lblResult.Name = "lblResult";
             this.lblResult.Size = new System.Drawing.Size(154, 20);
             this.lblResult.TabIndex = 11;
@@ -179,7 +182,7 @@
             this.cbStoreProcMappings.AutoSize = true;
             this.cbStoreProcMappings.Checked = true;
             this.cbStoreProcMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbStoreProcMappings.Location = new System.Drawing.Point(12, 417);
+            this.cbStoreProcMappings.Location = new System.Drawing.Point(12, 414);
             this.cbStoreProcMappings.Name = "cbStoreProcMappings";
             this.cbStoreProcMappings.Size = new System.Drawing.Size(199, 17);
             this.cbStoreProcMappings.TabIndex = 13;
@@ -192,7 +195,7 @@
             this.cbViewMappings.AutoSize = true;
             this.cbViewMappings.Checked = true;
             this.cbViewMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbViewMappings.Location = new System.Drawing.Point(12, 440);
+            this.cbViewMappings.Location = new System.Drawing.Point(12, 437);
             this.cbViewMappings.Name = "cbViewMappings";
             this.cbViewMappings.Size = new System.Drawing.Size(145, 17);
             this.cbViewMappings.TabIndex = 14;
@@ -205,7 +208,7 @@
             this.cbRelationalIntegrityMappings.AutoSize = true;
             this.cbRelationalIntegrityMappings.Checked = true;
             this.cbRelationalIntegrityMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbRelationalIntegrityMappings.Location = new System.Drawing.Point(12, 463);
+            this.cbRelationalIntegrityMappings.Location = new System.Drawing.Point(12, 460);
             this.cbRelationalIntegrityMappings.Name = "cbRelationalIntegrityMappings";
             this.cbRelationalIntegrityMappings.Size = new System.Drawing.Size(209, 17);
             this.cbRelationalIntegrityMappings.TabIndex = 15;
@@ -223,7 +226,9 @@
             // 
             // txtDestinationDirectory
             // 
-            this.txtDestinationDirectory.Location = new System.Drawing.Point(14, 537);
+            this.txtDestinationDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtDestinationDirectory.Location = new System.Drawing.Point(14, 528);
             this.txtDestinationDirectory.Name = "txtDestinationDirectory";
             this.txtDestinationDirectory.Size = new System.Drawing.Size(393, 20);
             this.txtDestinationDirectory.TabIndex = 17;
@@ -231,7 +236,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 521);
+            this.label4.Location = new System.Drawing.Point(13, 510);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(163, 13);
             this.label4.TabIndex = 18;
@@ -239,7 +244,8 @@
             // 
             // btnDirectorySelector
             // 
-            this.btnDirectorySelector.Location = new System.Drawing.Point(413, 537);
+            this.btnDirectorySelector.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDirectorySelector.Location = new System.Drawing.Point(413, 526);
             this.btnDirectorySelector.Name = "btnDirectorySelector";
             this.btnDirectorySelector.Size = new System.Drawing.Size(32, 23);
             this.btnDirectorySelector.TabIndex = 19;
@@ -253,18 +259,31 @@
             this.cbFunctionMappings.AutoSize = true;
             this.cbFunctionMappings.Checked = true;
             this.cbFunctionMappings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbFunctionMappings.Location = new System.Drawing.Point(12, 486);
+            this.cbFunctionMappings.Location = new System.Drawing.Point(12, 483);
             this.cbFunctionMappings.Name = "cbFunctionMappings";
             this.cbFunctionMappings.Size = new System.Drawing.Size(163, 17);
             this.cbFunctionMappings.TabIndex = 20;
             this.cbFunctionMappings.Text = "Generate Function Mappings";
             this.cbFunctionMappings.UseVisualStyleBackColor = true;
             // 
+            // doneTimer
+            // 
+            this.doneTimer.Interval = 200;
+            this.doneTimer.Tick += new System.EventHandler(this.DoneTimer_Tick);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(14, 554);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(431, 23);
+            this.progressBar1.TabIndex = 21;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(456, 604);
+            this.ClientSize = new System.Drawing.Size(456, 626);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.cbFunctionMappings);
             this.Controls.Add(this.btnDirectorySelector);
             this.Controls.Add(this.label4);
@@ -310,6 +329,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnDirectorySelector;
         private System.Windows.Forms.CheckBox cbFunctionMappings;
+        private System.Windows.Forms.Timer doneTimer;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 

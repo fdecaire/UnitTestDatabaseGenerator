@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnitTestHelperLibrary;
 
 namespace UnitTestDatabaseGenerator
@@ -15,9 +16,11 @@ namespace UnitTestDatabaseGenerator
         public bool GenerateFunctionMappings { get; set; }
 
         private readonly List<string> _deletedFiles = new List<string>();
-
-        public void CreateMappings()
+        private CancellationToken token;
+        public void CreateMappings(object action)
         {
+            token = (CancellationToken)action;
+
             Setup();
 
             CreateTableGeneratorMappings();

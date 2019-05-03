@@ -69,13 +69,8 @@ namespace UnitTestDatabaseGenerator
             @out.AppendLine($"\t\tpublic static StoredProc Instance => _instance ?? (_instance = new {_functionName}());");
             @out.AppendLine($"\t\tpublic override string Name => \"{_functionName}\";");
             @out.AppendLine($"\t\tpublic override string Database => \"{_databaseName}\";");
-            @out.AppendLine("\t\tpublic override string Code");
-            @out.AppendLine("\t\t{");
-            @out.AppendLine("\t\t\tget");
-            @out.AppendLine("\t\t\t{");
+            @out.AppendLine("\t\tpublic override string Code =>");
             @out.AppendLine("\t\t\t\treturn @\"" + _code.Replace("\"", "\"\"") + "\";");
-            @out.AppendLine("\t\t\t}");
-            @out.AppendLine("\t\t}");
             @out.AppendLine("\t}");
             @out.AppendLine("}");
 

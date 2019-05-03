@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using UnitTestHelperLibrary;
 
@@ -67,25 +68,19 @@ namespace UnitTestDatabaseGenerator
         
 		private void btnGenerate_Click(object sender, EventArgs e)
 		{
+            var databaseList = new List<string>();
             foreach (int index in lstDatabases.CheckedIndices)
-			{
-				var mappings = new GenerateMappings
-					{
-						DatabaseName = lstDatabases.Items[index].ToString(),
-						ConnectionString = GetConnectionString(),
-						GenerateIntegrityConstraintMappings = cbStoreProcMappings.Checked,
-						GenerateStoredProcedureMappings = cbStoreProcMappings.Checked,
-						GenerateViewMappings = cbViewMappings.Checked,
-                        GenerateFunctionMappings = cbFunctionMappings.Checked,
-                        RootDirectory = txtDestinationDirectory.Text
-                };
-                mappings.CreateMappings();
-			}
+            {
+                databaseList.Add(lstDatabases.Items[index].ToString());
+            }
 
-			// indicate that the operation has completed
-			btnGenerate.Enabled = false;
-			lblResult.Visible = true;
-		}
+            MasterProcessor.Instance.Start(databaseList,GetConnectionString(), cbRelationalIntegrityMappings.Checked,
+                cbStoreProcMappings.Checked,cbViewMappings.Checked,
+                cbFunctionMappings.Checked,txtDestinationDirectory.Text);
+
+            btnGenerate.Text = "Stop";
+            doneTimer.Enabled = true;
+        }
 
 		private void btnConnect_Click(object sender, EventArgs e)
 		{
@@ -116,6 +111,17 @@ namespace UnitTestDatabaseGenerator
                 {
                     txtDestinationDirectory.Text = folderBrowserDialog.SelectedPath;
                 }
+            }
+        }
+
+        private void DoneTimer_Tick(object sender, EventArgs e)
+        {
+            if (MasterProcessor.Instance.Stopped)
+            {
+                // indicate that the operation has completed
+                btnGenerate.Text = "Generate";
+                lblResult.Visible = true;
+                doneTimer.Enabled = false;
             }
         }
     }
