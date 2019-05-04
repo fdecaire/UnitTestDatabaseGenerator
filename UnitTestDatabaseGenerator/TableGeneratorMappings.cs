@@ -36,7 +36,7 @@ namespace UnitTestDatabaseGenerator
             return keyList;
         }
 
-        public string EmitCode()
+        public string EmitCode(string tableDefinitionString)
         {
             var @out = new StringBuilder();
 
@@ -59,6 +59,10 @@ namespace UnitTestDatabaseGenerator
 
             @out.AppendLine("\t\tpublic static List<TableDefinition> TableList = new List<TableDefinition> {");
 
+            @out.AppendLine(tableDefinitionString);
+
+            //TODO: Move this to GenerateMappings object
+            /*
             string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
             using (var db = new ADODatabaseContext(_connectionString))
             {
@@ -75,7 +79,7 @@ namespace UnitTestDatabaseGenerator
                     @out.AppendLine("},");
                 }
             }
-
+            */
             @out.AppendLine("\t\t};");
             @out.AppendLine("\t}");
             @out.AppendLine("}");
@@ -83,7 +87,7 @@ namespace UnitTestDatabaseGenerator
             return @out.ToString();
         }
 
-        private string EmitTableGenerateCode(string tableName, string schema)
+        public string EmitTableGenerateCode(string tableName, string schema)
         {
             var @out = new StringBuilder();
             var firstTime = true;

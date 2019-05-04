@@ -129,6 +129,10 @@ namespace UnitTestDatabaseGenerator
                 lblResult.Visible = true;
                 doneTimer.Enabled = false;
             }
+
+            progressBar.Value = MasterProcessor.Instance.PercentComplete;
+            progressBar.Minimum = 0;
+            progressBar.Maximum = MasterProcessor.Instance.TotalObjects;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using UnitTestHelperLibrary;
 
@@ -14,12 +15,15 @@ namespace UnitTestDatabaseGenerator
         public bool GenerateIntegrityConstraintMappings { get; set; }
         public bool GenerateStoredProcedureMappings { get; set; }
         public bool GenerateFunctionMappings { get; set; }
+        public int TotalCompleted { get; private set; }
 
         private readonly List<string> _deletedFiles = new List<string>();
         private CancellationToken _token;
         public void CreateMappings(object action)
         {
             _token = (CancellationToken)action;
+
+            TotalCompleted = 0;
 
             Setup();
 
@@ -68,6 +72,55 @@ namespace UnitTestDatabaseGenerator
             DeleteUnusedFiles();
         }
 
+        public int Count
+        {
+            get
+            {
+                var total = CountTables();
+                total += CountStoredProcedures();
+                total += CountViews();
+                total += CountConstraints();
+                total += CountFunctions();
+
+                return total;
+            }
+        }
+
+        private int CountFunctions()
+        {
+            return 0;
+        }
+
+        private int CountConstraints()
+        {
+            return 0;
+        }
+
+        private int CountViews()
+        {
+            return 0;
+        }
+
+        private int CountStoredProcedures()
+        {
+            return 0;
+        }
+
+        private int CountTables()
+        {
+            var query = "SELECT COUNT(*) AS Total FROM " + DatabaseName + ".INFORMATION_SCHEMA.tables";
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    return reader["Total"].ToInt();
+                }
+            }
+
+            return 0;
+        }
+
         private void CreateFunctionMappings()
         {
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Functions"));
@@ -97,6 +150,8 @@ namespace UnitTestDatabaseGenerator
 
                 file.Write(functionMappings.EmitCode());
             }
+
+            TotalCompleted++;
         }
 
         private void Setup()
@@ -135,9 +190,30 @@ namespace UnitTestDatabaseGenerator
         private void CreateTableGeneratorMappings()
         {
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode"));
-
+            var tableDefinitionString = new StringBuilder();
             var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName, _token);
-            var result = tableGeneratorMappings.EmitCode();
+
+            var query = "SELECT * FROM " + DatabaseName + ".INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    if (_token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    tableDefinitionString.Append("\t\t\tnew TableDefinition {");
+                    tableDefinitionString.Append(tableGeneratorMappings.EmitTableGenerateCode(reader["TABLE_NAME"].ToString(), reader["TABLE_SCHEMA"].ToString()));
+                    tableDefinitionString.AppendLine("},");
+
+                    TotalCompleted++;
+                }
+            }
+
+
+            var result = tableGeneratorMappings.EmitCode(tableDefinitionString.ToString());
 
             using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode", DatabaseName + "TableGeneratorCode.cs")))
             {
@@ -195,6 +271,7 @@ namespace UnitTestDatabaseGenerator
             }
 
             UpdateProjectFileList("StoredProcedures", storedProcedureName);
+            TotalCompleted++;
         }
 
         public void CreateViewMappings()
@@ -235,6 +312,7 @@ namespace UnitTestDatabaseGenerator
             }
 
             UpdateProjectFileList("Views", viewName);
+            TotalCompleted++;
         }
 
         public void CreateConstraintMappings()

@@ -49,7 +49,7 @@
             this.btnDirectorySelector = new System.Windows.Forms.Button();
             this.cbFunctionMappings = new System.Windows.Forms.CheckBox();
             this.doneTimer = new System.Windows.Forms.Timer(this.components);
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -271,19 +271,19 @@
             this.doneTimer.Interval = 200;
             this.doneTimer.Tick += new System.EventHandler(this.DoneTimer_Tick);
             // 
-            // progressBar1
+            // progressBar
             // 
-            this.progressBar1.Location = new System.Drawing.Point(14, 554);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(431, 23);
-            this.progressBar1.TabIndex = 21;
+            this.progressBar.Location = new System.Drawing.Point(14, 554);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(431, 23);
+            this.progressBar.TabIndex = 21;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 626);
-            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.cbFunctionMappings);
             this.Controls.Add(this.btnDirectorySelector);
             this.Controls.Add(this.label4);
@@ -330,7 +330,7 @@
         private System.Windows.Forms.Button btnDirectorySelector;
         private System.Windows.Forms.CheckBox cbFunctionMappings;
         private System.Windows.Forms.Timer doneTimer;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 
