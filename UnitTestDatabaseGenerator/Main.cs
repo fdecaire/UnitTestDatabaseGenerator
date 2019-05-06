@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using UnitTestHelperLibrary;
 
 namespace UnitTestDatabaseGenerator
 {
 	public partial class frmMain : Form
-	{
+    {
+        private string REGISTRY_SUBKEY_STRING = @"SOFTWARE\UnitTestDatabaseGenerator";
+        private string REGISTRY_DESTINATION_DIRECTORY_STRING = "DestinationDirectory";
+
 		public frmMain()
 		{
 			InitializeComponent();
@@ -17,8 +21,28 @@ namespace UnitTestDatabaseGenerator
 			// lookup all the data severs on this network and allow the user to select one
 
 
-			//TODO: set the selected item to the last saved item
-            txtDestinationDirectory.Text = @"c:\temp\testoutput";
+            txtDestinationDirectory.Text = ReadDirectoryFromRegistry();
+        }
+
+        private void SaveDirectoryInRegistry(string directory)
+        {
+            using (var key = Registry.CurrentUser.CreateSubKey(REGISTRY_SUBKEY_STRING))
+            {
+                key?.SetValue(REGISTRY_DESTINATION_DIRECTORY_STRING, directory);
+            }
+        }
+
+        private string ReadDirectoryFromRegistry()
+        {
+            using (var key = Registry.CurrentUser.OpenSubKey(REGISTRY_SUBKEY_STRING))
+            {
+                if (key != null)
+                {
+                    return key.GetValue(REGISTRY_DESTINATION_DIRECTORY_STRING).ToString();
+                }
+            }
+
+            return @"c:\temp\testoutput";
         }
 
 		private string GetConnectionString
@@ -71,6 +95,8 @@ namespace UnitTestDatabaseGenerator
                 lblResult.Text = "Process Cancelled";
                 return;
             }
+
+            SaveDirectoryInRegistry(txtDestinationDirectory.Text);
 
             var databaseList = new List<string>();
             foreach (int index in lstDatabases.CheckedIndices)
@@ -125,14 +151,22 @@ namespace UnitTestDatabaseGenerator
             if (MasterProcessor.Instance.Stopped)
             {
                 // indicate that the operation has completed
+                if (lblResult.Text == "Process Cancelled")
+                {
+                    progressBar.Value = 0;
+                }
+
                 btnGenerate.Text = "Generate";
                 lblResult.Visible = true;
                 doneTimer.Enabled = false;
             }
 
-            progressBar.Value = MasterProcessor.Instance.PercentComplete;
-            progressBar.Minimum = 0;
-            progressBar.Maximum = MasterProcessor.Instance.TotalObjects;
+            if (!lblResult.Visible)
+            {
+                progressBar.Value = MasterProcessor.Instance.PercentComplete;
+                progressBar.Minimum = 0;
+                progressBar.Maximum = MasterProcessor.Instance.TotalObjects;
+            }
         }
     }
 }

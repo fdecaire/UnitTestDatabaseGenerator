@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTestHelperLibrary;
@@ -61,10 +62,20 @@ namespace UnitTestDatabaseGenerator
                         _mappingList.Add(mapping);
                     }
 
-                    Parallel.ForEach(_mappingList, po, (mapping) =>
+                    try
                     {
-                        mapping.CreateMappings(action);
-                    });
+                        Parallel.ForEach(_mappingList, po, (mapping, loopState) =>
+                        {
+                            if (loopState.ShouldExitCurrentIteration || loopState.IsExceptional)
+                                loopState.Stop();
+
+                            mapping.CreateMappings(action);
+                        });
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
 
                 Stopped = true;
