@@ -16,12 +16,10 @@ namespace UnitTestDatabaseGenerator
                 int totalComplete = 0;
                 foreach (var mapping in _mappingList)
                 {
-                    totalComplete += mapping.TotalCompleted; //TODO: probably need to lock mapping first
+                    totalComplete += mapping.TotalCompleted;
                 }
 
-                var total = (int)((double)totalComplete / (double) TotalObjects * 100);
-
-                return total;
+                return totalComplete;
             }
         }
 

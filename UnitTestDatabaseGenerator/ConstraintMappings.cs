@@ -14,24 +14,11 @@ namespace UnitTestDatabaseGenerator
             _databaseName = databaseName;
 
             _connectionString = _connectionString.Replace("master", databaseName);
-
         }
 
-        public string EmitCode()
+        public string ConstraintMappingQueryString
         {
-            var result = new StringBuilder();
-            var firstTime = true;
-
-            result.AppendLine("using System.Collections.Generic;");
-            result.AppendLine("using UnitTestHelperLibrary;");
-            result.AppendLine("");
-            result.AppendLine("namespace ApplicationUnderTest." + _databaseName + ".Constraints");
-            result.AppendLine("{");
-            result.AppendLine("\tpublic class " + _databaseName + "Constraints");
-            result.AppendLine("\t{");
-            result.AppendLine("\t\tpublic static List<ConstraintDefinition> ConstraintList = new List<ConstraintDefinition> {");
-
-            using (var db = new ADODatabaseContext(_connectionString))
+            get
             {
                 var query = @"
                     SELECT PKTABLE_QUALIFIER = CONVERT(SYSNAME,DB_NAME()),
@@ -71,31 +58,24 @@ namespace UnitTestDatabaseGenerator
 			                     AND C2.OBJECT_ID = F.PARENT_OBJECT_ID
 			                     AND C1.COLUMN_ID = K.REFERENCED_COLUMN_ID
 			                     AND C2.COLUMN_ID = K.PARENT_COLUMN_ID";
-
-                var reader = db.ReadQuery(query);
-                while (reader.Read())
-                {
-                    var pkTableName = reader["PKTABLE_NAME"].ToString();
-                    var pkColumnName = reader["PKCOLUMN_NAME"].ToString();
-                    var fkTableName = reader["FKTABLE_NAME"].ToString();
-                    var fkColumnName = reader["FKCOLUMN_NAME"].ToString();
-                    var schemaName = reader["PKTABLE_OWNER"].ToString();
-
-                    if (!firstTime)
-                    {
-                        result.AppendLine(",");
-                    }
-
-                    firstTime = false;
-
-                    result.Append("\t\t\tnew ConstraintDefinition { DatabaseName=\"" + _databaseName + "\", PkTable = \"" + pkTableName + "\", PkField = \"" + pkColumnName + "\", FkTable = \"" + fkTableName + "\", FkField = \"" + fkColumnName + "\", SchemaName = \"" + schemaName + "\" }");
-                }
-
-                if (!firstTime)
-                {
-                    result.AppendLine("");
-                }
+                return query;
             }
+        }
+
+        public string EmitCode(string constraintMappingString)
+        {
+            var result = new StringBuilder();
+
+            result.AppendLine("using System.Collections.Generic;");
+            result.AppendLine("using UnitTestHelperLibrary;");
+            result.AppendLine("");
+            result.AppendLine("namespace ApplicationUnderTest." + _databaseName + ".Constraints");
+            result.AppendLine("{");
+            result.AppendLine("\tpublic class " + _databaseName + "Constraints");
+            result.AppendLine("\t{");
+            result.AppendLine("\t\tpublic static List<ConstraintDefinition> ConstraintList = new List<ConstraintDefinition> {");
+
+            result.AppendLine(constraintMappingString);
 
             result.AppendLine("\t\t};");
             result.AppendLine("\t}");
@@ -103,5 +83,4 @@ namespace UnitTestDatabaseGenerator
             return result.ToString();
         }
     }
-
 }

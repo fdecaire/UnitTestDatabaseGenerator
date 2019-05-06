@@ -9,7 +9,7 @@ namespace UnitTestDatabaseGenerator
     {
         private readonly string _databaseName;
         private readonly string _connectionString;
-        private CancellationToken _token;
+        private readonly CancellationToken _token;
 
         public TableGeneratorMappings(string connectionString, string databaseName, object action)
         {
@@ -61,25 +61,6 @@ namespace UnitTestDatabaseGenerator
 
             @out.AppendLine(tableDefinitionString);
 
-            //TODO: Move this to GenerateMappings object
-            /*
-            string query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
-            using (var db = new ADODatabaseContext(_connectionString))
-            {
-                var reader = db.ReadQuery(query);
-                while (reader.Read())
-                {
-                    if (_token.IsCancellationRequested)
-                    {
-                        return "";
-                    }
-
-                    @out.Append("\t\t\tnew TableDefinition {");
-                    @out.Append(EmitTableGenerateCode(reader["TABLE_NAME"].ToString(),reader["TABLE_SCHEMA"].ToString()));
-                    @out.AppendLine("},");
-                }
-            }
-            */
             @out.AppendLine("\t\t};");
             @out.AppendLine("\t}");
             @out.AppendLine("}");

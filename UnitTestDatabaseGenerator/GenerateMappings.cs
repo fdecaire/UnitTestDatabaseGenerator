@@ -88,21 +88,69 @@ namespace UnitTestDatabaseGenerator
 
         private int CountFunctions()
         {
+            var query = $"SELECT COUNT(*) AS Total FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'FUNCTION'";
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    return reader["Total"].ToInt();
+                }
+            }
+
             return 0;
         }
 
         private int CountConstraints()
         {
+            var query = @"
+                    SELECT 
+                        count(*) AS Total
+                    FROM 
+                        sys.foreign_key_columns as fk
+	                    inner join sys.tables as t on fk.parent_object_id = t.object_id
+	                    inner join sys.columns as c on fk.parent_object_id = c.object_id and 
+	                    fk.parent_column_id = c.column_id";
+
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    return reader["Total"].ToInt();
+                }
+            }
+
             return 0;
         }
 
         private int CountViews()
         {
+            var query = "SELECT count(*) AS Total FROM " + DatabaseName + ".information_schema.views";
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    return reader["Total"].ToInt();
+                }
+            }
+
             return 0;
         }
 
         private int CountStoredProcedures()
         {
+            var query = $"SELECT COUNT(*) AS Total FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'PROCEDURE'";
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(query);
+                while (reader.Read())
+                {
+                    return reader["Total"].ToInt();
+                }
+            }
+
             return 0;
         }
 
@@ -320,7 +368,38 @@ namespace UnitTestDatabaseGenerator
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Constraints"));
 
             var constraintMappings = new ConstraintMappings(ConnectionString, DatabaseName);
-            var result = constraintMappings.EmitCode();
+
+            var @out = new StringBuilder();
+            var firstTime = true;
+            using (var db = new ADODatabaseContext(ConnectionString))
+            {
+                var reader = db.ReadQuery(constraintMappings.ConstraintMappingQueryString);
+                while (reader.Read())
+                {
+                    var pkTableName = reader["PKTABLE_NAME"].ToString();
+                    var pkColumnName = reader["PKCOLUMN_NAME"].ToString();
+                    var fkTableName = reader["FKTABLE_NAME"].ToString();
+                    var fkColumnName = reader["FKCOLUMN_NAME"].ToString();
+                    var schemaName = reader["PKTABLE_OWNER"].ToString();
+
+                    if (!firstTime)
+                    {
+                        @out.AppendLine(",");
+                    }
+
+                    firstTime = false;
+
+                    @out.Append("\t\t\tnew ConstraintDefinition { DatabaseName=\"" + DatabaseName + "\", PkTable = \"" + pkTableName + "\", PkField = \"" + pkColumnName + "\", FkTable = \"" + fkTableName + "\", FkField = \"" + fkColumnName + "\", SchemaName = \"" + schemaName + "\" }");
+                    TotalCompleted++;
+                }
+
+                if (!firstTime)
+                {
+                    @out.AppendLine("");
+                }
+            }
+
+            var result = constraintMappings.EmitCode(@out.ToString());
 
             using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Constraints", DatabaseName + "Constraints.cs")))
             {
