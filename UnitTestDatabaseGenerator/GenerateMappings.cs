@@ -94,7 +94,7 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
-                    return reader["Total"].ToInt();
+                    return (int)reader["Total"];
                 }
             }
 
@@ -117,7 +117,7 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
-                    return reader["Total"].ToInt();
+                    return (int)reader["Total"];
                 }
             }
 
@@ -132,7 +132,7 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
-                    return reader["Total"].ToInt();
+                    return (int)reader["Total"];
                 }
             }
 
@@ -147,7 +147,7 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
-                    return reader["Total"].ToInt();
+                    return (int)reader["Total"];
                 }
             }
 
@@ -162,7 +162,7 @@ namespace UnitTestDatabaseGenerator
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
                 {
-                    return reader["Total"].ToInt();
+                    return (int)reader["Total"];
                 }
             }
 
