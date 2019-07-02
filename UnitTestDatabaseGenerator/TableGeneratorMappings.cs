@@ -22,7 +22,7 @@ namespace UnitTestDatabaseGenerator
         {
             var keyList = new List<string>();
 
-            var query = "SELECT * FROM " + _databaseName + ".INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='" + tableName + "' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
+            var query = "SELECT * FROM [" + _databaseName + "].INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='" + tableName + "' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
 
             using (var db = new ADODatabaseContext(_connectionString))
             {
@@ -76,7 +76,7 @@ namespace UnitTestDatabaseGenerator
             @out.Append("Name=\"" + tableName + "\", ");
 
             @out.Append($"CreateScript=\"CREATE TABLE [{schema}].[{tableName}](");
-            var query = $"SELECT * FROM {_databaseName}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='{tableName}' ORDER BY ORDINAL_POSITION";
+            var query = $"SELECT * FROM [{_databaseName}].INFORMATION_SCHEMA.COLUMNS WHERE table_name='{tableName}' ORDER BY ORDINAL_POSITION";
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -140,7 +140,7 @@ namespace UnitTestDatabaseGenerator
 
             // get the primary key
             firstTime = true;
-            query = $"SELECT * FROM {_databaseName}.INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='{tableName}' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
+            query = $"SELECT * FROM [{_databaseName}].INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name='{tableName}' AND CONSTRAINT_NAME LIKE 'PK_%' ORDER BY ORDINAL_POSITION";
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -186,7 +186,7 @@ namespace UnitTestDatabaseGenerator
             using (var db = new ADODatabaseContext(_connectionString))
             {
                 var queryString = "SELECT * " +
-                                 "FROM " + _databaseName + ".sys.identity_columns AS a INNER JOIN " + _databaseName + ".sys.objects AS b ON a.object_id=b.object_id " +
+                                 "FROM [" + _databaseName + "].sys.identity_columns AS a INNER JOIN [" + _databaseName + "].sys.objects AS b ON a.object_id=b.object_id " +
                                  "WHERE LOWER(b.name)='" + tableName.ToLower().Trim() + "' AND LOWER(a.name)='" +
                                  fieldName.ToLower().Trim() + "' AND type='U'";
 
