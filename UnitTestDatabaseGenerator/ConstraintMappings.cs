@@ -1,12 +1,11 @@
 ﻿using System.Text;
-using UnitTestHelperLibrary;
 
 namespace UnitTestDatabaseGenerator
 {
     public class ConstraintMappings
     {
-        private string _connectionString;
-        private string _databaseName;
+        private readonly string _connectionString;
+        private readonly string _databaseName;
 
         public ConstraintMappings(string connectionString, string databaseName)
         {

@@ -88,7 +88,7 @@ namespace UnitTestDatabaseGenerator
 
         private int CountFunctions()
         {
-            var query = $"SELECT COUNT(*) AS Total FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'FUNCTION'";
+            var query = $"SELECT COUNT(*) AS Total FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'FUNCTION'";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -126,7 +126,7 @@ namespace UnitTestDatabaseGenerator
 
         private int CountViews()
         {
-            var query = "SELECT count(*) AS Total FROM " + DatabaseName + ".information_schema.views";
+            var query = $"SELECT count(*) AS Total FROM [{DatabaseName}].information_schema.views";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -141,7 +141,7 @@ namespace UnitTestDatabaseGenerator
 
         private int CountStoredProcedures()
         {
-            var query = $"SELECT COUNT(*) AS Total FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'PROCEDURE'";
+            var query = $"SELECT COUNT(*) AS Total FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'PROCEDURE'";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -156,7 +156,7 @@ namespace UnitTestDatabaseGenerator
 
         private int CountTables()
         {
-            var query = "SELECT COUNT(*) AS Total FROM " + DatabaseName + ".INFORMATION_SCHEMA.tables";
+            var query = $"SELECT COUNT(*) AS Total FROM [{DatabaseName}].INFORMATION_SCHEMA.tables";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -172,7 +172,7 @@ namespace UnitTestDatabaseGenerator
         private void CreateFunctionMappings()
         {
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Functions"));
-            var query = $"SELECT ROUTINE_NAME,routine_schema FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'FUNCTION'";
+            var query = $"SELECT ROUTINE_NAME,routine_schema FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'FUNCTION'";
              
             using (var db = new ADODatabaseContext(ConnectionString))
             {
@@ -241,7 +241,7 @@ namespace UnitTestDatabaseGenerator
             var tableDefinitionString = new StringBuilder();
             var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName, _token);
 
-            var query = "SELECT * FROM " + DatabaseName + ".INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
+            var query = $"SELECT * FROM [{DatabaseName}].INFORMATION_SCHEMA.tables ORDER BY TABLE_SCHEMA,TABLE_NAME";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -286,7 +286,7 @@ namespace UnitTestDatabaseGenerator
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures"));
 
             var noStoredProceduresCreated = true;
-            var query = $"SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM {DatabaseName}.information_schema.routines WHERE routine_type = 'PROCEDURE'";
+            var query = $"SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'PROCEDURE'";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
@@ -327,7 +327,7 @@ namespace UnitTestDatabaseGenerator
             Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Views"));
 
             var noViewsCreated = true;
-            var query = "SELECT TABLE_NAME FROM " + DatabaseName + ".information_schema.views";
+            var query = $"SELECT TABLE_NAME FROM [{DatabaseName}].information_schema.views";
             using (var db = new ADODatabaseContext(ConnectionString))
             {
                 var reader = db.ReadQuery(query);
