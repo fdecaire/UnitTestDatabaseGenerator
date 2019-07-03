@@ -77,7 +77,7 @@ GO
 
             @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("");
-            @out.AppendLine("namespace DataLayer." + _databaseName + ".StoredProcedures");
+            @out.AppendLine("namespace DataLayer." + _databaseName.FixSpecialCharacters() + ".StoredProcedures");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic class " + _storedProcedureName + " : StoredProc");
@@ -86,8 +86,7 @@ GO
             @out.AppendLine("\t\tpublic static StoredProc Instance => _instance ?? (_instance = new " + _storedProcedureName + "());");
             @out.AppendLine("\t\tpublic override string Name => \"" + _storedProcedureName + "\";");
             @out.AppendLine("\t\tpublic override string Database => \"" + _databaseName + "\";");
-            @out.AppendLine("\t\tpublic override string Code =>");
-            @out.AppendLine("\t\t\t@\"" + _code.Replace("\"", "\"\"") + "\";");
+            @out.AppendLine("\t\tpublic override string Code => @\"" + _code.Replace("\"", "\"\"") + "\";");
             @out.AppendLine("\t}");
             @out.AppendLine("}");
 

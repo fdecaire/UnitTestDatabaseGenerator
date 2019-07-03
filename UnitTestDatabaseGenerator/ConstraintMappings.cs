@@ -68,9 +68,9 @@ namespace UnitTestDatabaseGenerator
             result.AppendLine("using System.Collections.Generic;");
             result.AppendLine("using UnitTestHelperLibrary;");
             result.AppendLine("");
-            result.AppendLine("namespace ApplicationUnderTest." + _databaseName + ".Constraints");
+            result.AppendLine("namespace DataLayer." + _databaseName.FixSpecialCharacters() + ".Constraints");
             result.AppendLine("{");
-            result.AppendLine("\tpublic class " + _databaseName + "Constraints");
+            result.AppendLine("\tpublic class " + _databaseName.FixSpecialCharacters() + "Constraints");
             result.AppendLine("\t{");
             result.AppendLine("\t\tpublic static List<ConstraintDefinition> ConstraintList = new List<ConstraintDefinition> {");
 

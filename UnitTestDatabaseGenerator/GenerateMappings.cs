@@ -112,7 +112,7 @@ namespace UnitTestDatabaseGenerator
 	                    inner join sys.columns as c on fk.parent_object_id = c.object_id and 
 	                    fk.parent_column_id = c.column_id";
 
-            using (var db = new ADODatabaseContext(ConnectionString))
+            using (var db = new ADODatabaseContext(ConnectionString.Replace("master", DatabaseName)))
             {
                 var reader = db.ReadQuery(query);
                 while (reader.Read())
@@ -171,7 +171,7 @@ namespace UnitTestDatabaseGenerator
 
         private void CreateFunctionMappings()
         {
-            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Functions"));
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Functions"));
             var query = $"SELECT ROUTINE_NAME,routine_schema FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'FUNCTION'";
              
             using (var db = new ADODatabaseContext(ConnectionString))
@@ -192,7 +192,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateFunction(string functionName, string schemaName)
         {
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Functions", functionName + $"_{schemaName}.cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Functions", functionName + $"_{schemaName}.cs")))
             {
                 var functionMappings = new FunctionMappings(ConnectionString, DatabaseName, functionName, schemaName);
 
@@ -205,7 +205,7 @@ namespace UnitTestDatabaseGenerator
         private void Setup()
         {
             // scan for all the files that currently exist and insert them into DeleteFiles
-            DirSearch(Path.Combine(RootDirectory, DatabaseName));
+            DirSearch(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters()));
         }
 
         private void DeleteUnusedFiles()
@@ -237,7 +237,7 @@ namespace UnitTestDatabaseGenerator
 
         private void CreateTableGeneratorMappings()
         {
-            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode"));
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "TableGeneratorCode"));
             var tableDefinitionString = new StringBuilder();
             var tableGeneratorMappings = new TableGeneratorMappings(ConnectionString, DatabaseName, _token);
 
@@ -263,7 +263,7 @@ namespace UnitTestDatabaseGenerator
 
             var result = tableGeneratorMappings.EmitCode(tableDefinitionString.ToString());
 
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "TableGeneratorCode", DatabaseName + "TableGeneratorCode.cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "TableGeneratorCode", DatabaseName.FixSpecialCharacters() + "TableGeneratorCode.cs")))
             {
                 file.Write(result);
             }
@@ -274,7 +274,7 @@ namespace UnitTestDatabaseGenerator
         private void UpdateProjectFileList(string tableSpView, string name)
         {
             // delete any existing table mappings first (in case a table was deleted)
-            var foundIndex = _deletedFiles.IndexOf(Path.Combine(RootDirectory, DatabaseName, tableSpView, name + ".cs"));
+            var foundIndex = _deletedFiles.IndexOf(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), tableSpView, name + ".cs"));
             if (foundIndex > -1)
             {
                 _deletedFiles.RemoveAt(foundIndex);
@@ -283,7 +283,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateStoredProcedureMappings()
         {
-            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures"));
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "StoredProcedures"));
 
             var noStoredProceduresCreated = true;
             var query = $"SELECT ROUTINE_NAME, ROUTINE_SCHEMA FROM [{DatabaseName}].information_schema.routines WHERE routine_type = 'PROCEDURE'";
@@ -311,7 +311,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateStoredProcedure(string storedProcedureName, string schemaName)
         {
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "StoredProcedures", storedProcedureName + $"_{schemaName}.cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "StoredProcedures", storedProcedureName + $"_{schemaName}.cs")))
             {
                 var storedProcedureMappings = new StoredProcedureMappings(ConnectionString, DatabaseName, storedProcedureName, schemaName);
 
@@ -324,7 +324,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateViewMappings()
         {
-            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Views"));
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Views"));
 
             var noViewsCreated = true;
             var query = $"SELECT TABLE_NAME FROM [{DatabaseName}].information_schema.views";
@@ -352,7 +352,7 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateView(string viewName)
         {
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Views", viewName + ".cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Views", viewName + ".cs")))
             {
                 var viewMappings = new ViewMappings(ConnectionString, DatabaseName, viewName);
 
@@ -365,13 +365,13 @@ namespace UnitTestDatabaseGenerator
 
         public void CreateConstraintMappings()
         {
-            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName, "Constraints"));
+            Directory.CreateDirectory(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Constraints"));
 
             var constraintMappings = new ConstraintMappings(ConnectionString, DatabaseName);
 
             var @out = new StringBuilder();
             var firstTime = true;
-            using (var db = new ADODatabaseContext(ConnectionString))
+            using (var db = new ADODatabaseContext(ConnectionString.Replace("master", DatabaseName)))
             {
                 var reader = db.ReadQuery(constraintMappings.ConstraintMappingQueryString);
                 while (reader.Read())
@@ -401,12 +401,12 @@ namespace UnitTestDatabaseGenerator
 
             var result = constraintMappings.EmitCode(@out.ToString());
 
-            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName, "Constraints", DatabaseName + "Constraints.cs")))
+            using (var file = new StreamWriter(Path.Combine(RootDirectory, DatabaseName.FixSpecialCharacters(), "Constraints", DatabaseName.FixSpecialCharacters() + "Constraints.cs")))
             {
                 file.Write(result);
             }
 
-            UpdateProjectFileList("Constraints", DatabaseName + "Constraints");
+            //UpdateProjectFileList("Constraints", DatabaseName + "Constraints");
         }
     }
 }

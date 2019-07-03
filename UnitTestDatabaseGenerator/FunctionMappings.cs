@@ -60,7 +60,7 @@ namespace UnitTestDatabaseGenerator
 
             @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("");
-            @out.AppendLine("namespace DataLayer." + _databaseName + ".Functions");
+            @out.AppendLine("namespace DataLayer." + _databaseName.FixSpecialCharacters() + ".Functions");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic class " + _functionName + " : StoredProc");
@@ -69,8 +69,7 @@ namespace UnitTestDatabaseGenerator
             @out.AppendLine($"\t\tpublic static StoredProc Instance => _instance ?? (_instance = new {_functionName}());");
             @out.AppendLine($"\t\tpublic override string Name => \"{_functionName}\";");
             @out.AppendLine($"\t\tpublic override string Database => \"{_databaseName}\";");
-            @out.AppendLine("\t\tpublic override string Code =>");
-            @out.AppendLine("\t\t\t\treturn @\"" + _code.Replace("\"", "\"\"") + "\";");
+            @out.AppendLine("\t\tpublic override string Code => @\"" + _code.Replace("\"", "\"\"") + "\";");
             @out.AppendLine("\t}");
             @out.AppendLine("}");
 

@@ -155,6 +155,10 @@ namespace UnitTestDatabaseGenerator
                 {
                     progressBar.Value = 0;
                 }
+                else
+                {
+                    progressBar.Value = progressBar.Maximum;
+                }
 
                 btnGenerate.Text = "Generate";
                 lblResult.Visible = true;

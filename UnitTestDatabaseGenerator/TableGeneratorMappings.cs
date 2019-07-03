@@ -44,17 +44,12 @@ namespace UnitTestDatabaseGenerator
             @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("using System.Collections.Generic;");
             @out.AppendLine("");
-            @out.AppendLine("namespace DataLayer." + _databaseName + ".TableGenerator");
+            @out.AppendLine("namespace DataLayer." + _databaseName.FixSpecialCharacters() + ".TableGenerator");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
-            @out.AppendLine("\tpublic partial class " + _databaseName + "Tables");
+            @out.AppendLine("\tpublic partial class " + _databaseName.FixSpecialCharacters() + "Tables");
             @out.AppendLine("\t{");
-            @out.AppendLine("\t\tpublic static string DatabaseName {");
-            @out.AppendLine("\t\t\tget ");
-            @out.AppendLine("\t\t\t{");
-            @out.AppendLine("\t\t\t\treturn \"" + _databaseName + "\";");
-            @out.AppendLine("\t\t\t}");
-            @out.AppendLine("\t\t}");
+            @out.AppendLine("\t\tpublic static string DatabaseName  => \"" + _databaseName + "\";");
             @out.AppendLine("");
 
             @out.AppendLine("\t\tpublic static List<TableDefinition> TableList = new List<TableDefinition> {");

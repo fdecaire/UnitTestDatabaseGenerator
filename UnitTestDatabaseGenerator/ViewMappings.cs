@@ -50,28 +50,16 @@ GO
 
             @out.AppendLine("using UnitTestHelperLibrary;");
             @out.AppendLine("");
-            @out.AppendLine("namespace DataLayer." + _databaseName + ".Views");
+            @out.AppendLine("namespace DataLayer." + _databaseName.FixSpecialCharacters() + ".Views");
             @out.AppendLine("{");
             @out.AppendLine("\t// DO NOT MODIFY! This code is auto-generated.");
             @out.AppendLine("\tpublic partial class view" + _viewName + " : ViewCreator");
             @out.AppendLine("\t{");
             @out.AppendLine("\t\tprivate static ViewCreator _instance;");
-            @out.AppendLine("\t\tpublic static ViewCreator Instance");
-            @out.AppendLine("\t\t{");
-            @out.AppendLine("\t\t\tget { return _instance ?? (_instance = new view" + _viewName + "()); }");
-            @out.AppendLine("\t\t}");
-            @out.AppendLine("\t\toverride public string Name");
-            @out.AppendLine("\t\t{");
-            @out.AppendLine("\t\t\tget { return \"" + _viewName + "\"; }");
-            @out.AppendLine("\t\t}");
-            @out.AppendLine("\t\toverride public string Database { get { return \"" + _databaseName + "\"; } }");
-            @out.AppendLine("\t\toverride public string Code");
-            @out.AppendLine("\t\t{");
-            @out.AppendLine("\t\t\tget");
-            @out.AppendLine("\t\t\t{");
-            @out.AppendLine("\t\t\treturn @\"" + _code.Replace("\"", "\"\"") + "\";");
-            @out.AppendLine("\t\t\t}");
-            @out.AppendLine("\t\t}");
+            @out.AppendLine("\t\tpublic static ViewCreator Instance => _instance ?? (_instance = new view" + _viewName + "());");
+            @out.AppendLine("\t\tpublic override string Name => \"" + _viewName + "\";");
+            @out.AppendLine("\t\tpublic override string Database => \"" + _databaseName + "\";");
+            @out.AppendLine("\t\tpublic override string Code => @\"" + _code.Replace("\"", "\"\"") + "\";");
             @out.AppendLine("\t}");
             @out.AppendLine("}");
 
